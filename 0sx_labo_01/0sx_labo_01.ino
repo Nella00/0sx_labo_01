@@ -1,8 +1,6 @@
 // la led qui sera utilisée
 const int LED = 13;
-// Des variables qui seront utilisées dans l'état de variation
-int brightness = 0;
-int fade = 5;
+
 
 void setup(){
   Serial.begin(9600);
@@ -14,7 +12,7 @@ void loop(){
 }
 
 void etatAllumer(){
-  Serial.println("Allume - 2201250");
+  Serial.println("Allumé - 2201250");
   digitalWrite(LED, HIGH);
   delay(2000);
   digitalWrite(LED, LOW);
@@ -34,15 +32,22 @@ void etatClignotement(){
 
 void etatVariation(){
   Serial.println("Variation - 2201250");
-  analogWrite(LED, brightness);
-  brightness = brightness + fade;
-  while (brightness <= 0 || brightness >= 255){
-    fade = -fade;
+  // État de variation
+  int brightness = 0;
+  int fade = 5;
+
+  while (brightness <= 255)
+  { // Fade
+    analogWrite(LED, brightness);
+    delay(40);
+    brightness = brightness + fade;
   }
-  cycly();
+  brightness = 0;
+  cycly();  
 }
 
 void cycly(){
   Serial.println("Éteint - 2201250");
+  digitalWrite(LED, LOW);
   delay(2000);
 }
