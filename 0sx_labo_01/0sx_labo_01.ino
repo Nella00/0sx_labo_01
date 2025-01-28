@@ -47,18 +47,19 @@ void loop() {
 void etatAllumer() {
   Serial.println("Allumé - 2201250");
   digitalWrite(LED, HIGH);
-  delay(2000); // Ici, on peut tolérer un délai bloquant
+  delay(2000);
   digitalWrite(LED, LOW);
   etatActuel = CLIGNOTER; // Passer à l'état suivant
 }
 
 void etatClignotement(unsigned long tempsActuel) {
+  Serial.println("Clignotement - 2201250");
   if (tempsActuel - dernierTemps >= intervalClignotement) {
     dernierTemps = tempsActuel;
     digitalWrite(LED, !digitalRead(LED)); // Inverser l'état de la LED
     clignotementCompteur++;
 
-    if (clignotementCompteur >= 8) { // 4 clignotements (ON/OFF = 2 intervalles)
+    if (clignotementCompteur >= 8) { // 4 clignotements
       clignotementCompteur = 0;
       digitalWrite(LED, LOW);
       etatActuel = VARIER; // Passer à l'état suivant
@@ -69,7 +70,7 @@ void etatClignotement(unsigned long tempsActuel) {
 void etatVariation(unsigned long tempsActuel) {
   Serial.println("Variation - 2201250");
   analogWrite(LED, brightness);
-  
+
   while (brightness <= 255)
   { // Fade
     analogWrite(LED, brightness);
