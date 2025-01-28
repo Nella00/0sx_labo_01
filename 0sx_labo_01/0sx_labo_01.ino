@@ -1,53 +1,88 @@
-// la led qui sera utilisée
+// Définir les pins
 const int LED = 13;
 
+// Définir les états possibles
+enum Etat { ALLUMER, CLIGNOTER, VARIER, ETEINT };
+Etat etatActuel = ALLUMER;
 
-void setup(){
+// Variables pour le clignotement
+unsigned long dernierTemps = 0;
+const unsigned long intervalClignotement = 250;
+int clignotementCompteur = 0;
+
+// Variables pour la variation
+int brightness = 0;
+int fade = 5;
+
+// Fonction setup
+void setup() {
   Serial.begin(9600);
   pinMode(LED, OUTPUT);
 }
 
-void loop(){
-  etatAllumer();
+// Fonction principale
+void loop() {
+  unsigned long tempsActuel = millis();
+  
+  switch (etatActuel) {
+    case ALLUMER:
+      etatAllumer();
+      break;
+
+    case CLIGNOTER:
+      etatClignotement(tempsActuel);
+      break;
+
+    case VARIER:
+      etatVariation(tempsActuel);
+      break;
+
+    case ETEINT:
+      etatEteint(tempsActuel);
+      break;
+  }
 }
 
-void etatAllumer(){
+// États définis
+void etatAllumer() {
   Serial.println("Allumé - 2201250");
   digitalWrite(LED, HIGH);
-  delay(2000);
+  delay(2000); // Ici, on peut tolérer un délai bloquant
   digitalWrite(LED, LOW);
-  etatClignotement();
+  etatActuel = CLIGNOTER; // Passer à l'état suivant
 }
 
-void etatClignotement(){
-  Serial.println("Clignotement - 2201250");
-  for (int i = 0; i < 4; i++){
-    digitalWrite(LED, HIGH);
-    delay(250);
-    digitalWrite(LED, LOW);
-    delay(250);
+void etatClignotement(unsigned long tempsActuel) {
+  if (tempsActuel - dernierTemps >= intervalClignotement) {
+    dernierTemps = tempsActuel;
+    digitalWrite(LED, !digitalRead(LED)); // Inverser l'état de la LED
+    clignotementCompteur++;
+
+    if (clignotementCompteur >= 8) { // 4 clignotements (ON/OFF = 2 intervalles)
+      clignotementCompteur = 0;
+      digitalWrite(LED, LOW);
+      etatActuel = VARIER; // Passer à l'état suivant
+    }
   }
-  etatVariation();
 }
 
-void etatVariation(){
+void etatVariation(unsigned long tempsActuel) {
   Serial.println("Variation - 2201250");
-  // État de variation
-  int brightness = 0;
-  int fade = 5;
-
+  analogWrite(LED, brightness);
+  
   while (brightness <= 255)
   { // Fade
     analogWrite(LED, brightness);
     delay(40);
-    brightness = brightness + fade;
+    brightness += fade;
   }
   brightness = 0;
-  cycly();  
+  etatActuel = ETEINT;
 }
 
-void cycly(){
+void etatEteint(unsigned long tempsActuel) {
   Serial.println("Éteint - 2201250");
   digitalWrite(LED, LOW);
-  delay(2000);
+  delay(2000); // Attente avant de redémarrer
+  etatActuel = ALLUMER; // Retourner à l'état initial
 }
