@@ -9,7 +9,6 @@ Etat etatActuel = ALLUMER;
 unsigned long dernierTemps = 0;
 const unsigned long intervalClignotement = 250;
 int clignotementCompteur = 0;
-bool affichageFait = false; // Variable pour éviter la répétition du serial.println
 
 // Variables pour la variation
 int brightness = 0;
@@ -50,15 +49,22 @@ void etatAllumer() {
   digitalWrite(LED, HIGH);
   delay(2000);
   digitalWrite(LED, LOW);
+  delay(500); // pour qu'on puisse voir le passage entre les états allumer et clignotement
   etatActuel = CLIGNOTER; // Passer à l'état suivant
 }
- // etat clignotement
+
+// etat clignotement
 void etatClignotement(unsigned long tempsActuel) {
-  if (!affichageFait) { // Afficher le message une seule fois
-    Serial.println("Clignotement - 2201250");
-    affichageFait = true;
+  Serial.println("Clignotement - 2201250");
+  for (int i = 0; i < 4; i++){
+    digitalWrite(LED, HIGH);
+    delay(250);
+    digitalWrite(LED, LOW);
+    delay(250);
   }
-  if (tempsActuel - dernierTemps >= intervalClignotement) {
+  etatActuel = VARIER; // Passer à l'état suivant
+
+/*  if (tempsActuel - dernierTemps >= intervalClignotement) {
     dernierTemps = tempsActuel;
     digitalWrite(LED, !digitalRead(LED)); // Inversion de l'état de la LED
     clignotementCompteur++;
@@ -66,10 +72,10 @@ void etatClignotement(unsigned long tempsActuel) {
     if (clignotementCompteur >= 8) { // 4 clignotements
       clignotementCompteur = 0;
       digitalWrite(LED, LOW);
-      etatActuel = VARIER; // Passer à l'état suivant
     }
   }
-  
+*/
+ 
 }
 
 // etat variaion
