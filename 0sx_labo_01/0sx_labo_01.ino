@@ -1,7 +1,7 @@
-// Définir les pins
+// Définition des pins
 const int LED = 13;
 
-// Définir les états possibles
+// Définition des états possibles
 enum Etat { ALLUMER, CLIGNOTER, VARIER, ETEINT };
 Etat etatActuel = ALLUMER;
 
@@ -43,7 +43,7 @@ void loop() {
   }
 }
 
-// États définis
+// États allumer
 void etatAllumer() {
   Serial.println("Allumé - 2201250");
   digitalWrite(LED, HIGH);
@@ -51,12 +51,12 @@ void etatAllumer() {
   digitalWrite(LED, LOW);
   etatActuel = CLIGNOTER; // Passer à l'état suivant
 }
-
+ // etat clignotement
 void etatClignotement(unsigned long tempsActuel) {
   Serial.println("Clignotement - 2201250");
   if (tempsActuel - dernierTemps >= intervalClignotement) {
     dernierTemps = tempsActuel;
-    digitalWrite(LED, !digitalRead(LED)); // Inverser l'état de la LED
+    digitalWrite(LED, !digitalRead(LED)); // Inversion de l'état de la LED
     clignotementCompteur++;
 
     if (clignotementCompteur >= 8) { // 4 clignotements
@@ -65,8 +65,10 @@ void etatClignotement(unsigned long tempsActuel) {
       etatActuel = VARIER; // Passer à l'état suivant
     }
   }
+  
 }
 
+// etat variaion
 void etatVariation(unsigned long tempsActuel) {
   Serial.println("Variation - 2201250");
   analogWrite(LED, brightness);
@@ -78,12 +80,13 @@ void etatVariation(unsigned long tempsActuel) {
     brightness += fade;
   }
   brightness = 0;
-  etatActuel = ETEINT;
+  etatActuel = ETEINT; // passer à l'état suivant
 }
 
+// etat eteint
 void etatEteint(unsigned long tempsActuel) {
   Serial.println("Éteint - 2201250");
   digitalWrite(LED, LOW);
-  delay(2000); // Attente avant de redémarrer
+  delay(2000);
   etatActuel = ALLUMER; // Retourner à l'état initial
 }
