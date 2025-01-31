@@ -9,6 +9,7 @@ Etat etatActuel = ALLUMER;
 unsigned long dernierTemps = 0;
 const unsigned long intervalClignotement = 250;
 int clignotementCompteur = 0;
+bool affichageFait = false; // Variable pour éviter la répétition du serial.println
 
 // Variables pour la variation
 int brightness = 0;
@@ -53,7 +54,10 @@ void etatAllumer() {
 }
  // etat clignotement
 void etatClignotement(unsigned long tempsActuel) {
-  Serial.println("Clignotement - 2201250");
+  if (!affichageFait) { // Afficher le message une seule fois
+    Serial.println("Clignotement - 2201250");
+    affichageFait = true;
+  }
   if (tempsActuel - dernierTemps >= intervalClignotement) {
     dernierTemps = tempsActuel;
     digitalWrite(LED, !digitalRead(LED)); // Inversion de l'état de la LED
